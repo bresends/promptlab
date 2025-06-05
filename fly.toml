@@ -1,0 +1,20 @@
+# fly.toml app configuration file generated for promptlab on 2025-06-05T20:48:25-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'promptlab'
+primary_region = 'gru'
+
+[build]
+
+[http_service]
+  internal_port = 5000
+  force_https = true
+  auto_start_machines = false
+  auto_stop_machines = true
+  min_machines_running = 1
+  processes = ['app']
+
+[[vm]]
+  size = 'shared-cpu-1x'
