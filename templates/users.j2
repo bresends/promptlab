@@ -1,0 +1,37 @@
+{% extends "base.j2" %}
+
+{% block title %}All Users{% endblock title %}
+
+{% block content %}
+<div>
+    <h2>All Users</h2>
+
+    {% if users %}
+    <table style="border-collapse: collapse; width: 100%; margin-bottom: 20px;">
+        <thead>
+            <tr style="background-color: #f0f0f0;">
+                <th style="border: 1px solid #ddd; padding: 8px;">ID</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Username</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td style="border: 1px solid #ddd; padding: 8px;">{{ user.id }}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">{{ user.username }}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">{{ user.email }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No users found in the database.</p>
+    {% endif %}
+
+    <div>
+        <a href="{{ url_for('index') }}">Back to Home</a>
+        <a href="{{ url_for('create_user') }}" style="margin-left: 10px;">Create New User</a>
+    </div>
+</div>
+{% endblock content %}

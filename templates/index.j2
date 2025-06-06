@@ -5,8 +5,21 @@
 {% block content %}
 <p>{{ message }}</p>
 
-<a href={{ url_for('set_data') }}>Set session data</a>
-<a href={{ url_for('get_data') }}>Get session data</a>
-<a href={{ url_for('clear_data') }}>Clear session data</a>
-<a href={{ url_for('login') }}>Login</a>
+<div style="margin-bottom: 20px;">
+    <h3>Session Management</h3>
+    <a href={{ url_for('set_data') }}>Set session data</a> |
+    <a href={{ url_for('get_data') }}>Get session data</a> |
+    <a href={{ url_for('clear_data') }}>Clear session data</a>
+</div>
+
+<div style="margin-bottom: 20px;">
+    <h3>User Management</h3>
+    <a href={{ url_for('create_user') }}>Create New User</a> |
+    <a href={{ url_for('show_users') }}>View All Users</a>
+</div>
+
+<div style="margin-bottom: 20px;">
+    <h3>Authentication</h3>
+    <a href={{ url_for('login') }}>Login</a>
+</div>
 {% endblock content %}
