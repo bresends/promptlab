@@ -1,29 +1,37 @@
-from flask import render_template, session, request, redirect, url_for, flash
-from models.user import User
+from pathlib import Path
+
+from flask import flash, redirect, render_template, request, url_for
+
 from app import db
+from models.user import User
+from prompts.prompt_manager import PromptManager
 
 
-def index():
-    """Main index page"""
-    return render_template("index.j2", message="Hello, World!")
+def list_prompts():
+    """List all available prompt templates"""
+    try:
+        prompts_dir = Path(__file__).parent.parent / "prompts" / "blueprints"
 
+        if not prompts_dir.exists():
+            flash("Templates directory not found", "warning")
+            return render_template("index.j2", templates=[])
 
-def set_data():
-    """Set data in session"""
-    session["name"] = "Mike"
-    return render_template("index.j2", message="Data has been set in the session!")
+        # Get all template files
+        template_files = [f.stem for f in prompts_dir.glob("*.jinja2")]
 
+        # Get template info for each
+        templates_info = []
+        for template_name in template_files:
+            try:
+                info = PromptManager.get_template_info(template_name)
+                templates_info.append(info)
+            except Exception as e:
+                print(f"Error loading template {template_name}: {e}")
 
-def get_data():
-    """Get data from session"""
-    name = session.get("name", "No data found in session")
-    return render_template("index.j2", message=f"Session data: {name}")
-
-
-def clear_data():
-    """Clear data from session"""
-    session.pop("name", None)
-    return render_template("index.j2", message="Session data has been cleared!")
+        return render_template("index.j2", templates=templates_info)
+    except Exception as e:
+        flash(f"Error loading templates: {str(e)}", "danger")
+        return render_template("index.j2", templates=[])
 
 
 def show_users():

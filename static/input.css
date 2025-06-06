@@ -1,1 +1,20 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-base-50: #f2f5fc;
+  --color-base-100: #e1e8f8;
+  --color-base-200: #cad6f3;
+  --color-base-300: #a5bceb;
+  --color-base-400: #7a99e0;
+  --color-base-500: #5b78d6;
+  --color-base-600: #475dc9;
+  --color-base-700: #3845aa;
+  --color-base-800: #373f96;
+  --color-base-900: #303878;
+  --color-base-950: #21254a;
+}
+
+.container {
+  @apply mx-auto max-w-[1320px] px-4 sm:px-6 lg:px-8;
+}
