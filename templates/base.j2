@@ -5,7 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{url_for('static',filename='output.css')}}">
-    <title>{% block title %}Default Title{% endblock %}</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>{% block title %}Default Title{% endblock title %}</title>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cognition,search" />
 </head>
 
 <body>
@@ -19,8 +22,15 @@
     {% endif %}
     {% endwith %}
 
-    <h1 class="text-blue-600">Hello, Flask!</h1>
+    <nav class="shadow-sm">
+        <div class="container flex justify-between p-4">
 
+            <a class="text-base-950 font-bold flex items-center" href={{ url_for('index') }}>
+                <span class="material-symbols-outlined mr-1">cognition</span>
+                <span class="text-bold text-xl">PromptLab</span>
+            </a>
+        </div>
+    </nav>
 
     {% block content %}{% endblock content%}
 </body>
