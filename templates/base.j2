@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static',filename='output.css')}}">
     <title>{% block title %}Default Title{% endblock %}</title>
 </head>
 
@@ -18,7 +19,10 @@
     {% endif %}
     {% endwith %}
 
-    {% block content %}{% endblock %}
+    <h1 class="text-blue-600">Hello, Flask!</h1>
+
+
+    {% block content %}{% endblock content%}
 </body>
 
 </html>
