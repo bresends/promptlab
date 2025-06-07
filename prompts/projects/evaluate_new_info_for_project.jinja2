@@ -37,44 +37,6 @@ tags: projects, relevance, evaluation
     * Always consider opportunity cost - time spent consuming this against the potential benefit for the quality of the project
 </rules>
 
-<project>
-    - Name: {{ project.name }}
-    - Description: {{ project.description }}
-    - Purpose: {{ project.purpose }}
-    - Desired Outcome: {{ project.desired_outcome }}
-    - Created At: {{ project.created_at }}
-    - Deadline: {{ project.deadline }}
-    - Status: {{ project.status }}
-    - Priority: {{ project.priority }}
-</project>
-
-<tasks>
-    {% if project.tasks %}
-    {% for task in project.tasks %}
-    <task number="{{ loop.index }}">
-        <name>{{ task.name }}</name>
-        <description>{{ task.description }}</description>
-        <status>{{ task.status }}</status>
-        <priority>{{ task.priority }}</priority>
-        <due_date>{{ task.due_date }}</due_date>
-        <resources>
-        {% if task.resources %}
-        {% for resource in task.resources %}
-            <resource number="{{ loop.index }}">
-                <title>{{ resource.title }}</title>
-                <url>{{ resource.url }}</url>
-                <type>{{ resource.type }}</type>
-                <notes>{{ resource.notes }}</notes>
-                <is_consumed>{{ resource.is_consumed }}</is_consumed>
-            </resource>
-        {% endfor %}
-        {% else %}
-            No resources for this task.
-        {% endif %}
-        </resources>
-    </task>
-    {% endfor %}
-    {% else %}
-    No tasks for this project.
-    {% endif %}
-</tasks>
+<project_info>
+    {{ project_info_json }}
+</project_info>
