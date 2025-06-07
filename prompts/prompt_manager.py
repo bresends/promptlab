@@ -85,9 +85,17 @@ class PromptManager:
         ast = env.parse(post.content)
         variables = meta.find_undeclared_variables(ast)
 
+        # Extract category from the template path
+        category = (
+            template_path.split("/")[0]
+            if "/" in template_path
+            else "general"
+        )
+
         return {
             "name": template_path.split("/")[-1],  # Get just the filename part
             "path": template_path,
+            "category": category,
             "description": post.metadata.get("description", "No description provided"),
             "author": post.metadata.get("author", "Unknown"),
             "tags": post.metadata.get("tags", []),

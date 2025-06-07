@@ -34,49 +34,54 @@
                     <h3 class="text-lg font-semibold text-base-950">{{ prompt.name|replace('_', ' ')|title }}</h3>
                 </div>
 
-                <div class="flex-grow space-y-3">
-                    {% if prompt.description %}
-                    <p class="text-gray-600 py-1">{{ prompt.description }}</p>
-                    {% endif %}
-
-                    <div class="flex items-end">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-5 h-5 text-gray-500 flex-shrink-0 mt-0.5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M4.745 3A23.933 23.933 0 0 0 3 12c0 3.183.62 6.22 1.745 9M19.5 3c.967 2.78 1.5 5.817 1.5 9s-.533 6.22-1.5 9M8.25 8.885l1.444-.89a.75.75 0 0 1 1.105.402l2.402 7.206a.75.75 0 0 0 1.104.401l1.445-.889m-8.25.75.213.09a1.687 1.687 0 0 0 2.062-.617l4.45-6.676a1.688 1.688 0 0 1 2.062-.618l.213.09" />
-                        </svg>
-                        <span class="text-gray-500 ml-2">
-                            <span class="font-medium">Variables:</span>
-                            {% if prompt.variables %}
-                            {{ prompt.variables|join(', ') }}
-                            {% else %}
-                            None
-                            {% endif %}
-                        </span>
+                <div class="flex-grow flex flex-col">
+                    <div class="flex-grow">
+                        {% if prompt.description %}
+                        <p class="text-gray-600 py-1">{{ prompt.description }}</p>
+                        {% endif %}
                     </div>
 
-                    {% if prompt.frontmatter.tags %}
-                    <div class="flex flex-wrap gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.95 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
-                        </svg>
-                        <div class="flex flex-wrap gap-2 items-center">
-                            <span class="text-base font-normal leading-tight text-gray-500"><span
-                                    class="font-semibold">Tags:</span></span>
-                            {% set tags_list = prompt.frontmatter.tags.split(', ') if prompt.frontmatter.tags is string
-                            else prompt.frontmatter.tags %}
-
-                            {% for tag in tags_list %}
-                            <span class="px-1 py-0.5 bg-base-100 text-blue-800 text-xs rounded-sm">
-                                {{ tag.strip() }}
+                    <div class="space-y-3 mt-4">
+                        <div class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5 text-gray-500 flex-shrink-0 mt-0.5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M4.745 3A23.933 23.933 0 0 0 3 12c0 3.183.62 6.22 1.745 9M19.5 3c.967 2.78 1.5 5.817 1.5 9s-.533 6.22-1.5 9M8.25 8.885l1.444-.89a.75.75 0 0 1 1.105.402l2.402 7.206a.75.75 0 0 0 1.104.401l1.445-.889m-8.25.75.213.09a1.687 1.687 0 0 0 2.062-.617l4.50-6.676a1.688 1.688 0 0 1 2.062-.618l.213.09" />
+                            </svg>
+                            <span class="text-gray-500 ml-2">
+                                <span class="font-medium">Variables:</span>
+                                {% if prompt.variables %}
+                                {{ prompt.variables|join(', ') }}
+                                {% else %}
+                                None
+                                {% endif %}
                             </span>
-                            {% endfor %}
                         </div>
+
+                        {% if prompt.frontmatter.tags %}
+                        <div class="flex flex-wrap gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.95 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+                            </svg>
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <span class="text-base font-normal leading-tight text-gray-500"><span
+                                        class="font-semibold">Tags:</span></span>
+                                {% set tags_list = prompt.frontmatter.tags.split(', ') if prompt.frontmatter.tags is
+                                string
+                                else prompt.frontmatter.tags %}
+
+                                {% for tag in tags_list %}
+                                <span class="px-1 py-0.5 bg-base-100 text-blue-800 text-xs rounded-sm">
+                                    {{ tag.strip() }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
 
                 <div class="mt-4 pt-4 border-t border-gray-100">
