@@ -34,6 +34,27 @@ def list_prompts():
         return render_template("index.j2", templates=[])
 
 
+def render_prompt(template_name):
+    template_data = {}
+
+    # Handle other variables
+    for key, value in request.form.items():
+        if key != "project_id" and value.strip():
+            template_data[key] = value
+
+    # Render the prompt
+    rendered_prompt = PromptManager.get_prompt(template_name, **template_data)
+    template_info = PromptManager.get_template_info(template_name)
+
+    return render_template(
+        "prompts/rendered.html",
+        template_name=template_name,
+        rendered_prompt=rendered_prompt,
+        template_info=template_info,
+        template_data=template_data,
+    )
+
+
 def show_users():
     """Display all users from the database"""
     try:
