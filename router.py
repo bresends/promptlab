@@ -8,11 +8,12 @@ from routes.auth import login
 def register_routes(app: Flask, db: SQLAlchemy):
     app.add_url_rule("/", endpoint="list_prompts", view_func=list_prompts)
 
+    # Handle nested prompt paths like /youtube/compare_videos/
     app.add_url_rule(
-        "/<template_name>/",
+        "/<path:template_path>/",
         endpoint="render_prompt",
         view_func=render_prompt,
-        methods=["GET", "POST"]
+        methods=["GET", "POST"],
     )
     app.add_url_rule("/users", endpoint="users", view_func=show_users)
     app.add_url_rule(

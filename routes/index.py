@@ -8,36 +8,23 @@ from prompts.prompt_manager import PromptManager
 
 
 def list_prompts():
-    """List all available prompt templates"""
+    """List all available prompt templates organized by category"""
     try:
-        prompts_dir = Path(__file__).parent.parent / "prompts" / "blueprints"
+        prompts_by_category = PromptManager.get_all_prompts()
 
-        if not prompts_dir.exists():
-            flash("Templates directory not found", "warning")
-            return render_template("index.j2", templates=[])
+        if not prompts_by_category:
+            flash("No templates found", "warning")
 
-        # Get all template files
-        template_files = [f.stem for f in prompts_dir.glob("*.jinja2")]
-
-        # Get template info for each
-        templates_info = []
-        for template_name in template_files:
-            try:
-                info = PromptManager.get_template_info(template_name)
-                templates_info.append(info)
-            except Exception as e:
-                print(f"Error loading template {template_name}: {e}")
-
-        return render_template("index.j2", templates=templates_info)
+        return render_template("index.j2", prompts_by_category=prompts_by_category)
     except Exception as e:
         flash(f"Error loading templates: {str(e)}", "danger")
-        return render_template("index.j2", templates=[])
+        return render_template("index.j2", prompts_by_category={})
 
 
-def render_prompt(template_name):
-    """Render prompt template with interactive form"""
+def render_prompt(template_path):
+    """Render prompt template with interactive form using path (e.g., 'youtube/compare_videos')"""
     try:
-        template_info = PromptManager.get_template_info(template_name)
+        template_info = PromptManager.get_template_info(template_path)
 
         # Initialize template data
         template_data = {}
@@ -47,12 +34,14 @@ def render_prompt(template_name):
         if request.method == "POST":
             # Handle form variables
             for key, value in request.form.items():
-                if key in template_info['variables'] and value.strip():
+                if key in template_info["variables"] and value.strip():
                     template_data[key] = value
 
             # Try to render the prompt with current data
             try:
-                rendered_prompt = PromptManager.get_prompt(template_name, **template_data)
+                rendered_prompt = PromptManager.get_prompt(
+                    template_path, **template_data
+                )
             except Exception as e:
                 # If rendering fails (missing variables), show partial render
                 rendered_prompt = f"Error rendering prompt: {str(e)}"
@@ -60,21 +49,24 @@ def render_prompt(template_name):
             # For GET requests, try to render with empty values to show template structure
             try:
                 # Create empty values for all variables
-                empty_data = {var: f"[{var.upper()}]" for var in template_info['variables']}
-                rendered_prompt = PromptManager.get_prompt(template_name, **empty_data)
+                empty_data = {
+                    var: f"[{var.upper()}]" for var in template_info["variables"]
+                }
+                rendered_prompt = PromptManager.get_prompt(template_path, **empty_data)
             except Exception:
                 rendered_prompt = "Fill in the variables to see the rendered prompt."
 
         return render_template(
             "prompts/interactive.j2",
-            template_name=template_name,
+            template_name=template_info["name"],
+            template_path=template_path,
             template_info=template_info,
             template_data=template_data,
             rendered_prompt=rendered_prompt,
         )
 
     except Exception as e:
-        flash(f"Error loading template {template_name}: {str(e)}", "danger")
+        flash(f"Error loading template {template_path}: {str(e)}", "danger")
         return redirect(url_for("list_prompts"))
 
 

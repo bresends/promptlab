@@ -3,63 +3,106 @@
 {% block title %}Prompt Templates{% endblock %}
 
 {% block content %}
-
 <div class="container mt-4">
-    <div class="flex justify-between items-center mb-4">
-        <h1 class="text-4xl font-bold text-base-950 py-5">Prompt Templates</h1>
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-bold text-base-950">Prompt Library</h1>
     </div>
 
-    {% if templates %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for template in templates %}
-        <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col">
+    {% if prompts_by_category %}
+    {% for category, prompts in prompts_by_category.items() %}
+    <div class="mb-12">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6 mr-2 text-base-950 mt-1">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+            </svg>
+            {{ category|title }}
+        </h2>
 
-            <div class="flex items-start gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-6 h-6 text-base-950 flex-shrink-0">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                </svg>
-                <h5 class="mb-4 text-xl font-medium text-base-950">{{ template.name|title }}</h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for prompt in prompts %}
+            <div
+                class="p-6 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow flex flex-col">
+
+                <div class="flex items-start gap-2 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-6 h-6 text-base-800 flex-shrink-0 mt-0.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    </svg>
+                    <h3 class="text-lg font-semibold text-base-950">{{ prompt.name|replace('_', ' ')|title }}</h3>
+                </div>
+
+                <div class="flex-grow space-y-3">
+                    {% if prompt.description %}
+                    <p class="text-gray-600 py-1">{{ prompt.description }}</p>
+                    {% endif %}
+
+                    <div class="flex items-end">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-5 h-5 text-gray-500 flex-shrink-0 mt-0.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M4.745 3A23.933 23.933 0 0 0 3 12c0 3.183.62 6.22 1.745 9M19.5 3c.967 2.78 1.5 5.817 1.5 9s-.533 6.22-1.5 9M8.25 8.885l1.444-.89a.75.75 0 0 1 1.105.402l2.402 7.206a.75.75 0 0 0 1.104.401l1.445-.889m-8.25.75.213.09a1.687 1.687 0 0 0 2.062-.617l4.45-6.676a1.688 1.688 0 0 1 2.062-.618l.213.09" />
+                        </svg>
+                        <span class="text-gray-500 ml-2">
+                            <span class="font-medium">Variables:</span>
+                            {% if prompt.variables %}
+                            {{ prompt.variables|join(', ') }}
+                            {% else %}
+                            None
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    {% if prompt.frontmatter.tags %}
+                    <div class="flex flex-wrap gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.95 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
+                        </svg>
+                        <div class="flex flex-wrap gap-2 items-center">
+                            <span class="text-base font-normal leading-tight text-gray-500"><span
+                                    class="font-semibold">Tags:</span></span>
+                            {% set tags_list = prompt.frontmatter.tags.split(', ') if prompt.frontmatter.tags is string
+                            else prompt.frontmatter.tags %}
+
+                            {% for tag in tags_list %}
+                            <span class="px-1 py-0.5 bg-base-100 text-blue-800 text-xs rounded-sm">
+                                {{ tag.strip() }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-gray-100">
+
+                    <a href="{{ url_for('render_prompt', template_path=prompt.path) }}"
+                        class="w-full bg-blue-700 hover:bg-blue-800 text-white font-medium rounded-lg text-sm px-5 py-2.5 inline-flex justify-center items-center transition-colors">
+                        Use Template
+                    </a>
+                </div>
             </div>
-            <ul role="list" class="space-y-3 my-4 flex-grow">
-                <li class="flex items-start">
-                    <span class="text-base font-normal leading-tight text-gray-500">{{ template.description }}</span>
-                </li>
-                <li class="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-5 h-5 text-gray-500 flex-shrink-0 mt-0.5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M4.745 3A23.933 23.933 0 0 0 3 12c0 3.183.62 6.22 1.745 9M19.5 3c.967 2.78 1.5 5.817 1.5 9s-.533 6.22-1.5 9M8.25 8.885l1.444-.89a.75.75 0 0 1 1.105.402l2.402 7.206a.75.75 0 0 0 1.104.401l1.445-.889m-8.25.75.213.09a1.687 1.687 0 0 0 2.062-.617l4.45-6.676a1.688 1.688 0 0 1 2.062-.618l.213.09" />
-                    </svg>
-                    <span class="text-base font-normal leading-tight text-gray-500 ml-3"><span class="font-semibold">Variables:</span> {{
-                        template.variables|join(', ') if template.variables else 'None'
-                        }}</span>
-                </li>
-                <li class="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z" />
-                    </svg>
-                    <span class="text-base font-normal leading-tight text-gray-500 ml-3"><span class="font-semibold">Tags:</span> {{
-                        template.frontmatter.tags if template.frontmatter and template.frontmatter.tags else 'None'
-                        }}</span>
-                </li>
-            </ul>
-            <a href="{{ url_for('render_prompt', template_name=template.name) }}"
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-200 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex justify-center w-full text-center mt-auto">Use
-                Template</a>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
+    {% endfor %}
+
     {% else %}
-    <div class="text-center py-5">
-        <span class="material-icons text-7xl text-gray-500">search</span>
-        <h3 class="text-muted mt-3">No Templates Found</h3>
-        <p class="text-muted">Create some .jinja2 files in the prompts/blueprints directory.</p>
+    <div class="text-center py-12">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+            class="w-16 h-16 text-gray-400 mx-auto mb-4">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 18l-3-3m0 0l-3 3m3-3v-1.5M6.75 7.5A1.5 1.5 0 015.25 6H2.25A2.25 2.25 0 000 8.25v.75a2.25 2.25 0 002.25 2.25h3A1.5 1.5 0 006.75 9.75V7.5z" />
+        </svg>
+        <h3 class="text-xl font-medium text-gray-900 mb-2">No Templates Found</h3>
+        <p class="text-gray-500">Create some .jinja2 files in the prompts directory to get started.</p>
     </div>
     {% endif %}
+
 </div>
 {% endblock content %}
