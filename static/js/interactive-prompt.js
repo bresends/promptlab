@@ -24,6 +24,10 @@ function updatePrompt() {
                 const currentPreview = document.getElementById('promptPreview');
                 if (currentPreview) {
                     currentPreview.innerHTML = newPreview.innerHTML;
+                    // Re-highlight the syntax after updating content
+                    if (typeof Prism !== 'undefined') {
+                        Prism.highlightAllUnder(currentPreview);
+                    }
                 }
             }
         })
@@ -48,7 +52,9 @@ function copyPrompt() {
     const promptPreview = document.getElementById('promptPreview');
     if (!promptPreview) return;
 
-    const promptText = promptPreview.textContent;
+    // Get text content from the code element inside the pre tag
+    const codeElement = promptPreview.querySelector('code');
+    const promptText = codeElement ? codeElement.textContent : promptPreview.textContent;
     navigator.clipboard.writeText(promptText).then(() => {
         const button = document.getElementById('copyButton');
         if (!button) return;
@@ -79,5 +85,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const copyButton = document.getElementById('copyButton');
     if (copyButton) {
         copyButton.addEventListener('click', copyPrompt);
+    }
+
+    // Initialize Prism highlighting
+    if (typeof Prism !== 'undefined') {
+        Prism.highlightAll();
     }
 });

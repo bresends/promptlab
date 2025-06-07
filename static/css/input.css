@@ -20,3 +20,38 @@
     @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 }
+
+/* Prism.js XML syntax highlighting for prompt preview */
+#promptPreview pre[class*="language-"] {
+  @apply bg-transparent border-0 m-0 p-0 font-mono text-sm leading-relaxed text-gray-700;
+  white-space: pre-wrap !important;
+}
+
+#promptPreview code[class*="language-"] {
+  @apply bg-transparent text-gray-700 font-mono;
+}
+
+/* XML tag highlighting */
+#promptPreview .token.tag {
+  @apply text-red-600;
+}
+
+#promptPreview .token.tag .token.tag {
+  @apply text-red-600;
+}
+
+#promptPreview .token.tag .token.punctuation {
+  @apply text-red-600;
+}
+
+#promptPreview .token.attr-name {
+  @apply text-green-600;
+}
+
+#promptPreview .token.attr-value {
+  @apply text-cyan-600;
+}
+
+#promptPreview .token.punctuation:not(.token.tag .token.punctuation) {
+  @apply text-gray-700;
+}
