@@ -6,9 +6,13 @@ from routes.auth import login
 
 
 def register_routes(app: Flask, db: SQLAlchemy):
-    app.add_url_rule("/", endpoint="index", view_func=list_prompts)
+    app.add_url_rule("/", endpoint="list_prompts", view_func=list_prompts)
+
     app.add_url_rule(
-        "/<template_name>/", endpoint="render_prompt", view_func=render_prompt
+        "/<template_name>/",
+        endpoint="render_prompt",
+        view_func=render_prompt,
+        methods=["GET", "POST"]
     )
     app.add_url_rule("/users", endpoint="users", view_func=show_users)
     app.add_url_rule(

@@ -11,7 +11,7 @@ def login():
             session["logged_in"] = True
             session["username"] = username
             flash("Login successful!")
-            return redirect(url_for("index"))
+            return redirect(url_for("list_prompts"))
         else:
             flash("Invalid username or password!")
 

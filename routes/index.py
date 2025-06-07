@@ -35,24 +35,47 @@ def list_prompts():
 
 
 def render_prompt(template_name):
-    template_data = {}
+    """Render prompt template with interactive form"""
+    try:
+        template_info = PromptManager.get_template_info(template_name)
 
-    # Handle other variables
-    for key, value in request.form.items():
-        if key != "project_id" and value.strip():
-            template_data[key] = value
+        # Initialize template data
+        template_data = {}
+        rendered_prompt = ""
 
-    # Render the prompt
-    rendered_prompt = PromptManager.get_prompt(template_name, **template_data)
-    template_info = PromptManager.get_template_info(template_name)
+        # If this is a POST request, process the form data
+        if request.method == "POST":
+            # Handle form variables
+            for key, value in request.form.items():
+                if key in template_info['variables'] and value.strip():
+                    template_data[key] = value
 
-    return render_template(
-        "prompts/rendered.html",
-        template_name=template_name,
-        rendered_prompt=rendered_prompt,
-        template_info=template_info,
-        template_data=template_data,
-    )
+            # Try to render the prompt with current data
+            try:
+                rendered_prompt = PromptManager.get_prompt(template_name, **template_data)
+            except Exception as e:
+                # If rendering fails (missing variables), show partial render
+                rendered_prompt = f"Error rendering prompt: {str(e)}"
+        else:
+            # For GET requests, try to render with empty values to show template structure
+            try:
+                # Create empty values for all variables
+                empty_data = {var: f"[{var.upper()}]" for var in template_info['variables']}
+                rendered_prompt = PromptManager.get_prompt(template_name, **empty_data)
+            except Exception:
+                rendered_prompt = "Fill in the variables to see the rendered prompt."
+
+        return render_template(
+            "prompts/interactive.j2",
+            template_name=template_name,
+            template_info=template_info,
+            template_data=template_data,
+            rendered_prompt=rendered_prompt,
+        )
+
+    except Exception as e:
+        flash(f"Error loading template {template_name}: {str(e)}", "danger")
+        return redirect(url_for("list_prompts"))
 
 
 def show_users():
@@ -62,7 +85,7 @@ def show_users():
         return render_template("users.j2", users=users)
     except Exception as e:
         flash(f"Error retrieving users: {str(e)}")
-        return redirect(url_for("index"))
+        return redirect(url_for("list_prompts"))
 
 
 def create_user():
@@ -75,7 +98,7 @@ def create_user():
 
             if not username or not email or not password:
                 flash("All fields are required!")
-                return redirect(url_for("index"))
+                return redirect(url_for("list_prompts"))
 
             new_user = User()
             new_user.username = username
@@ -85,12 +108,12 @@ def create_user():
             db.session.add(new_user)
             db.session.commit()
             flash(f"User {username} created successfully!")
-            return redirect(url_for("index"))
+            return redirect(url_for("list_prompts"))
 
         except Exception as e:
             db.session.rollback()
             flash(f"Error creating user: {str(e)}")
-            return redirect(url_for("index"))
+            return redirect(url_for("list_prompts"))
 
     # For GET requests, show the create user form
     return render_template("create_user.j2")
