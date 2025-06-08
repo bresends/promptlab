@@ -89,6 +89,15 @@ function copyUserPrompt() {
     copyToClipboard(promptText, 'copyUserButton');
 }
 
+function copySchema() {
+    const schemaPreview = document.getElementById('schemaPreview');
+    if (!schemaPreview) return;
+
+    const codeElement = schemaPreview.querySelector('code');
+    const schemaText = codeElement ? codeElement.textContent : schemaPreview.textContent;
+    copyToClipboard(schemaText, 'copySchemaButton');
+}
+
 function copyBothPrompts() {
     const systemPreview = document.getElementById('systemPromptPreview');
     const userPreview = document.getElementById('userPromptPreview');
@@ -159,8 +168,19 @@ document.addEventListener('DOMContentLoaded', function() {
         copyBothButton.addEventListener('click', copyBothPrompts);
     }
 
+    const copySchemaButton = document.getElementById('copySchemaButton');
+    if (copySchemaButton) {
+        copySchemaButton.addEventListener('click', copySchema);
+    }
+
     // Initialize Prism highlighting
     if (typeof Prism !== 'undefined') {
         Prism.highlightAll();
+        
+        // Ensure schema section gets highlighted if it exists
+        const schemaPreview = document.getElementById('schemaPreview');
+        if (schemaPreview) {
+            Prism.highlightAllUnder(schemaPreview);
+        }
     }
 });

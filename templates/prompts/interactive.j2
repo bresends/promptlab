@@ -97,7 +97,7 @@
                 </div>
 
                 <!-- User Prompt -->
-                <div>
+                <div class="mb-6">
                     <h3 class="text-lg font-medium text-gray-900 mb-3 flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="w-5 h-5 text-gray-600">
@@ -116,6 +116,29 @@
                         <pre class="language-xml whitespace-pre-wrap"><code class="language-xml">{{ prompt_parts.user|e }}</code></pre>
                     </div>
                 </div>
+
+                <!-- Schema (if available) -->
+                {% if template_info.schema %}
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-3 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="w-5 h-5 text-gray-600">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                        </svg>
+                        Schema
+                    </h3>
+
+                    <div id="schemaPreview" class="bg-gray-50 rounded-lg p-4 border border-gray-200 min-h-[200px] overflow-auto relative">
+                        <button id="copySchemaButton" class="absolute top-3 right-3 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded transition-colors duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
+                            </svg>
+                        </button>
+                        <pre class="language-json"><code class="language-json">{{ template_info.schema|e }}</code></pre>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
