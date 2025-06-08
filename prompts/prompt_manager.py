@@ -52,6 +52,53 @@ class PromptManager:
         return prompts_by_category
 
     @staticmethod
+    def is_multi_step_template(template_path):
+        """Check if a template is multi-step"""
+        template_info = PromptManager.get_template_info(template_path)
+        return template_info.get("is_multi_step", False)
+
+    @staticmethod
+    def get_step_info(template_path, step_id):
+        """Get information about a specific step in a multi-step template"""
+        template_info = PromptManager.get_template_info(template_path)
+        if not template_info.get("is_multi_step"):
+            raise ValueError(f"Template {template_path} is not a multi-step template")
+        
+        steps = template_info.get("steps", [])
+        for step in steps:
+            if step.get("id") == step_id:
+                return step
+        
+        raise ValueError(f"Step {step_id} not found in template {template_path}")
+
+    @staticmethod
+    def render_step(template_path, step_id, step_responses=None, llm_outputs=None, **kwargs):
+        """Render a specific step of a multi-step template"""
+        step_info = PromptManager.get_step_info(template_path, step_id)
+        step_template = step_info.get("template", "")
+        
+        # Create context with step responses and LLM outputs
+        context = kwargs.copy()
+        
+        # Add step responses (form variables from each step)
+        if step_responses:
+            for resp_step_id, variables in step_responses.items():
+                if isinstance(variables, dict):
+                    context.update(variables)
+        
+        # Add LLM outputs from previous steps
+        if llm_outputs:
+            context["llm_outputs"] = llm_outputs
+        
+        # Render the step template
+        env = PromptManager._get_env()
+        template = env.from_string(step_template)
+        try:
+            return template.render(**context)
+        except TemplateError as e:
+            raise ValueError(f"Error rendering step {step_id}: {str(e)}")
+
+    @staticmethod
     def get_prompt(template_path, **kwargs):
         env = PromptManager._get_env()
         template_file = f"{template_path}.jinja2"
@@ -92,6 +139,9 @@ class PromptManager:
             else "general"
         )
 
+        # Check if this is a multi-step template
+        is_multi_step = post.metadata.get("type") == "multi-step"
+        
         return {
             "name": template_path.split("/")[-1],  # Get just the filename part
             "path": template_path,
@@ -101,4 +151,6 @@ class PromptManager:
             "tags": post.metadata.get("tags", []),
             "variables": list(variables),
             "frontmatter": post.metadata,
+            "is_multi_step": is_multi_step,
+            "steps": post.metadata.get("steps", []) if is_multi_step else [],
         }

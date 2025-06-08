@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for, session
 
 from app import db
 from models.user import User
@@ -25,6 +25,10 @@ def render_prompt(template_path):
     """Render prompt template with interactive form using path (e.g., 'youtube/compare_videos')"""
     try:
         template_info = PromptManager.get_template_info(template_path)
+        
+        # Check if this is a multi-step template
+        if template_info.get("is_multi_step"):
+            return render_multi_step_prompt(template_path, template_info)
 
         # Initialize template data
         template_data = {}
@@ -67,6 +71,96 @@ def render_prompt(template_path):
 
     except Exception as e:
         flash(f"Error loading template {template_path}: {str(e)}", "danger")
+        return redirect(url_for("list_prompts"))
+
+
+def render_multi_step_prompt(template_path, template_info):
+    """Handle multi-step prompt rendering"""
+    try:
+        # Get current step from query parameter, default to first step
+        current_step_id = request.args.get('step', template_info['steps'][0]['id'])
+        
+        # Get step responses from session
+        session_key = f"multistep_{template_path.replace('/', '_')}"
+        step_responses = session.get(session_key, {})
+        
+        # Find current step info
+        current_step = None
+        step_index = 0
+        for i, step in enumerate(template_info['steps']):
+            if step['id'] == current_step_id:
+                current_step = step
+                step_index = i
+                break
+        
+        if not current_step:
+            flash(f"Step {current_step_id} not found", "danger")
+            return redirect(url_for("list_prompts"))
+        
+        rendered_step = ""
+        
+        # Handle POST request (step submission)
+        if request.method == "POST":
+            # Handle form variables for current step
+            step_variables = {}
+            for var in current_step.get('variables', []):
+                value = request.form.get(var, '').strip()
+                if value:
+                    step_variables[var] = value
+            
+            # Save step variables
+            step_responses[current_step_id] = step_variables
+            
+            # Handle LLM output if provided
+            llm_output = request.form.get('llm_output', '').strip()
+            if llm_output:
+                # Save LLM output for this step
+                llm_outputs_key = f"{session_key}_llm_outputs"
+                llm_outputs = session.get(llm_outputs_key, {})
+                llm_outputs[current_step_id] = llm_output
+                session[llm_outputs_key] = llm_outputs
+                
+                # Move to next step if there are more steps
+                next_step_index = step_index + 1
+                if next_step_index < len(template_info['steps']):
+                    next_step_id = template_info['steps'][next_step_index]['id']
+                    session[session_key] = step_responses
+                    return redirect(url_for('render_prompt', template_path=template_path, step=next_step_id))
+                else:
+                    # All steps completed
+                    session[session_key] = step_responses
+                    flash("Workflow completed successfully!", "success")
+                    return redirect(url_for('list_prompts'))
+            
+            # If no LLM output provided, just save variables and stay on current step
+            session[session_key] = step_responses
+        
+        # Get LLM outputs for context
+        llm_outputs_key = f"{session_key}_llm_outputs"
+        llm_outputs = session.get(llm_outputs_key, {})
+        
+        # Render current step
+        try:
+            rendered_step = PromptManager.render_step(
+                template_path, current_step_id, step_responses, llm_outputs
+            )
+        except Exception as e:
+            rendered_step = f"Error rendering step: {str(e)}"
+        
+        return render_template(
+            "prompts/multi_step.j2",
+            template_name=template_info["name"],
+            template_path=template_path,
+            template_info=template_info,
+            current_step=current_step,
+            current_step_index=step_index,
+            total_steps=len(template_info['steps']),
+            rendered_step=rendered_step,
+            step_responses=step_responses,
+        )
+        
+    except Exception as e:
+        flash(f"Error rendering multi-step template {template_path}: {str(e)}", "danger")
         return redirect(url_for("list_prompts"))
 
 
