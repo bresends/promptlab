@@ -45,6 +45,10 @@ Required environment variables:
 
 The application uses python-dotenv to load from `.env` file.
 
+## Frontend Styling
+
+- The app uses custom Prism.js CSS in /static/css/input.css instead of external Prism CSS libraries. All syntax highlighting styles are defined there and built with TailwindCSS.
+
 ## Git Workflow
 Always follow the Conventional Commits specification for all commit messages. Write clear, concise, and descriptive messages that accurately summarize what was changed and why. Don't ever mention Claude Code on the messages.
 The message 🤖 Generated with [Claude Code](https://claude.ai/code)  Co-Authored-By: Claude <noreply@anthropic.com>" if forbidden. Never use it.
