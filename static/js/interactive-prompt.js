@@ -98,6 +98,32 @@ function copySchema() {
     copyToClipboard(schemaText, 'copySchemaButton');
 }
 
+function copyGoogleSchema() {
+    const schemaPreview = document.getElementById('schemaPreview');
+    if (!schemaPreview) return;
+
+    const codeElement = schemaPreview.querySelector('code');
+    const schemaText = codeElement ? codeElement.textContent : schemaPreview.textContent;
+    
+    try {
+        // Parse the existing JSON schema
+        const schema = JSON.parse(schemaText);
+        
+        // Transform to Google Gemini format - just extract the key parts
+        const googleSchema = {
+            type: "object",
+            required: schema.required || [],
+            properties: schema.properties || {}
+        };
+        
+        // Copy the transformed schema
+        copyToClipboard(JSON.stringify(googleSchema, null, 2), 'copyGoogleSchemaButton');
+    } catch (error) {
+        console.error('Failed to transform schema:', error);
+        alert('Failed to transform schema to Google format');
+    }
+}
+
 function copyBothPrompts() {
     const systemPreview = document.getElementById('systemPromptPreview');
     const userPreview = document.getElementById('userPromptPreview');
@@ -171,6 +197,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const copySchemaButton = document.getElementById('copySchemaButton');
     if (copySchemaButton) {
         copySchemaButton.addEventListener('click', copySchema);
+    }
+
+    const copyGoogleSchemaButton = document.getElementById('copyGoogleSchemaButton');
+    if (copyGoogleSchemaButton) {
+        copyGoogleSchemaButton.addEventListener('click', copyGoogleSchema);
     }
 
     // Initialize Prism highlighting
