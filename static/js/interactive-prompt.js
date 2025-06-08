@@ -20,26 +20,36 @@ function updatePrompt() {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             
-            // Update system prompt preview
+            // Update system prompt preview (preserve the copy button)
             const newSystemPreview = doc.getElementById('systemPromptPreview');
             if (newSystemPreview) {
                 const currentSystemPreview = document.getElementById('systemPromptPreview');
                 if (currentSystemPreview) {
-                    currentSystemPreview.innerHTML = newSystemPreview.innerHTML;
-                    if (typeof Prism !== 'undefined') {
-                        Prism.highlightAllUnder(currentSystemPreview);
+                    // Extract the new content (everything except the button)
+                    const newSystemContent = newSystemPreview.querySelector('pre');
+                    const currentSystemContent = currentSystemPreview.querySelector('pre');
+                    if (newSystemContent && currentSystemContent) {
+                        currentSystemContent.innerHTML = newSystemContent.innerHTML;
+                        if (typeof Prism !== 'undefined') {
+                            Prism.highlightAllUnder(currentSystemContent);
+                        }
                     }
                 }
             }
             
-            // Update user prompt preview
+            // Update user prompt preview (preserve the copy button)
             const newUserPreview = doc.getElementById('userPromptPreview');
             if (newUserPreview) {
                 const currentUserPreview = document.getElementById('userPromptPreview');
                 if (currentUserPreview) {
-                    currentUserPreview.innerHTML = newUserPreview.innerHTML;
-                    if (typeof Prism !== 'undefined') {
-                        Prism.highlightAllUnder(currentUserPreview);
+                    // Extract the new content (everything except the button)
+                    const newUserContent = newUserPreview.querySelector('pre');
+                    const currentUserContent = currentUserPreview.querySelector('pre');
+                    if (newUserContent && currentUserContent) {
+                        currentUserContent.innerHTML = newUserContent.innerHTML;
+                        if (typeof Prism !== 'undefined') {
+                            Prism.highlightAllUnder(currentUserContent);
+                        }
                     }
                 }
             }

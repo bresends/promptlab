@@ -46,7 +46,5 @@ Required environment variables:
 The application uses python-dotenv to load from `.env` file.
 
 ## Git Workflow
-Always follow the Conventional Commits specification for all commit messages. Write clear, concise, and descriptive messages that accurately summarize what was changed and why.
-
-## Commit Guidelines
-- Never mention in the commit descriptions claude was used.
+Always follow the Conventional Commits specification for all commit messages. Write clear, concise, and descriptive messages that accurately summarize what was changed and why. Don't ever mention Claude Code on the messages.
+The message 🤖 Generated with [Claude Code](https://claude.ai/code)  Co-Authored-By: Claude <noreply@anthropic.com>" if forbidden. Never use it.
