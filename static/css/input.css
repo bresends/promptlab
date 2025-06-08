@@ -21,17 +21,19 @@
   }
 }
 
-/* Prism.js XML syntax highlighting for prompt preview */
+/* Prism.js syntax highlighting for prompt preview */
 #promptPreview pre[class*="language-"],
 #systemPromptPreview pre[class*="language-"],
-#userPromptPreview pre[class*="language-"] {
+#userPromptPreview pre[class*="language-"],
+#schemaPreview pre[class*="language-"] {
   @apply bg-transparent border-0 m-0 p-0 font-mono text-sm leading-relaxed text-gray-700;
   white-space: pre-wrap !important;
 }
 
 #promptPreview code[class*="language-"],
 #systemPromptPreview code[class*="language-"],
-#userPromptPreview code[class*="language-"] {
+#userPromptPreview code[class*="language-"],
+#schemaPreview code[class*="language-"] {
   @apply bg-transparent text-gray-700 font-mono;
 }
 
@@ -69,5 +71,30 @@
 #promptPreview .token.punctuation:not(.token.tag .token.punctuation),
 #systemPromptPreview .token.punctuation:not(.token.tag .token.punctuation),
 #userPromptPreview .token.punctuation:not(.token.tag .token.punctuation) {
+  @apply text-gray-700;
+}
+
+/* JSON syntax highlighting */
+#schemaPreview .token.property {
+  @apply text-red-600;
+}
+
+#schemaPreview .token.string {
+  @apply text-gray-700;
+}
+
+#schemaPreview .token.number {
+  @apply text-green-600;
+}
+
+#schemaPreview .token.boolean {
+  @apply text-green-600;
+}
+
+#schemaPreview .token.null {
+  @apply text-gray-500;
+}
+
+#schemaPreview .token.punctuation {
   @apply text-gray-700;
 }
