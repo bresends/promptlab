@@ -2,83 +2,82 @@
 title: "Software Analysis Multi-Step Workflow"
 description: "A multi-step workflow for analyzing software requirements, generating architecture, and creating implementation plans"
 author: "PromptLab"
+version: "1.0"
+last_modified: "2025-06-08"
 tags: ["project-planning", "architecture", "multi-step", "workflow"]
 type: "multi-step"
 steps:
   - id: "requirements"
     title: "Requirements Analysis"
-    description: "Analyze and clarify software requirements"
     variables: ["project_description", "target_users", "key_features"]
-    template: |
-      You are a senior software architect. Analyze the following project description and provide a detailed requirements analysis.
-
-      **Project Description:** {{ project_description }}
-      **Target Users:** {{ target_users }}  
-      **Key Features:** {{ key_features }}
-
-      Please provide:
-      1. Functional requirements breakdown
-      2. Non-functional requirements (performance, security, scalability)
-      3. User stories for key features
-      4. Potential technical challenges
-      5. Questions that need clarification
-
-      Format your response clearly with sections for each area above.
-    
-  - id: "architecture"
+  - id: "architecture" 
     title: "System Architecture Design"
-    description: "Design system architecture based on requirements"
     variables: ["technology_preferences", "team_size", "timeline"]
     depends_on: ["requirements"]
-    template: |
-      You are a senior software architect. Based on the requirements analysis below, design a system architecture.
-
-      **Requirements Analysis from Step 1:**
-      {{ llm_outputs.requirements }}
-
-      **Additional Context:**
-      - Technology Preferences: {{ technology_preferences }}
-      - Team Size: {{ team_size }}
-      - Timeline: {{ timeline }}
-
-      Please provide:
-      1. High-level system architecture diagram (text description)
-      2. Technology stack recommendations
-      3. Database design considerations
-      4. API design approach
-      5. Deployment architecture
-      6. Security considerations
-
-      Be specific about technology choices and justify your decisions based on the requirements.
-
   - id: "implementation"
     title: "Implementation Plan"
-    description: "Create detailed implementation roadmap"
     variables: ["priority_features", "resources_available"]
     depends_on: ["requirements", "architecture"]
-    template: |
-      You are a project manager and technical lead. Create a detailed implementation plan based on the previous analysis.
-
-      **Requirements Analysis:**
-      {{ llm_outputs.requirements }}
-
-      **System Architecture:**
-      {{ llm_outputs.architecture }}
-
-      **Current Context:**
-      - Priority Features: {{ priority_features }}
-      - Available Resources: {{ resources_available }}
-
-      Please provide:
-      1. Development phases breakdown
-      2. Sprint planning suggestions (2-week sprints)
-      3. Team roles and responsibilities
-      4. Risk assessment and mitigation strategies
-      5. Testing strategy
-      6. Deployment plan
-      7. Success metrics and milestones
-
-      Create a realistic timeline with dependencies and deliverables for each phase.
 ---
 
-This is a multi-step workflow template. Each step generates a prompt to use with an LLM, and subsequent steps can reference the LLM outputs from previous steps.
+{% if step_number == 1 %}
+You are a senior software architect. Analyze the following project description and provide a detailed requirements analysis.
+
+**Project Description:** {{ project_description }}
+**Target Users:** {{ target_users }}  
+**Key Features:** {{ key_features }}
+
+Please provide:
+1. Functional requirements breakdown
+2. Non-functional requirements (performance, security, scalability)
+3. User stories for key features
+4. Potential technical challenges
+5. Questions that need clarification
+
+Format your response clearly with sections for each area above.
+
+{% elif step_number == 2 %}
+You are a senior software architect. Based on the requirements analysis below, design a system architecture.
+
+**Requirements Analysis from Step 1:**
+{{ llm_outputs.requirements }}
+
+**Additional Context:**
+- Technology Preferences: {{ technology_preferences }}
+- Team Size: {{ team_size }}
+- Timeline: {{ timeline }}
+
+Please provide:
+1. High-level system architecture diagram (text description)
+2. Technology stack recommendations
+3. Database design considerations
+4. API design approach
+5. Deployment architecture
+6. Security considerations
+
+Be specific about technology choices and justify your decisions based on the requirements.
+
+{% elif step_number == 3 %}
+You are a project manager and technical lead. Create a detailed implementation plan based on the previous analysis.
+
+**Requirements Analysis:**
+{{ llm_outputs.requirements }}
+
+**System Architecture:**
+{{ llm_outputs.architecture }}
+
+**Current Context:**
+- Priority Features: {{ priority_features }}
+- Available Resources: {{ resources_available }}
+
+Please provide:
+1. Development phases breakdown
+2. Sprint planning suggestions (2-week sprints)
+3. Team roles and responsibilities
+4. Risk assessment and mitigation strategies
+5. Testing strategy
+6. Deployment plan
+7. Success metrics and milestones
+
+Create a realistic timeline with dependencies and deliverables for each phase.
+{% endif %}

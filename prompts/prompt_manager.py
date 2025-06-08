@@ -75,7 +75,6 @@ class PromptManager:
     def render_step(template_path, step_id, step_responses=None, llm_outputs=None, **kwargs):
         """Render a specific step of a multi-step template"""
         step_info = PromptManager.get_step_info(template_path, step_id)
-        step_template = step_info.get("template", "")
         
         # Create context with step responses and LLM outputs
         context = kwargs.copy()
@@ -90,13 +89,23 @@ class PromptManager:
         if llm_outputs:
             context["llm_outputs"] = llm_outputs
         
-        # Render the step template
-        env = PromptManager._get_env()
-        template = env.from_string(step_template)
-        try:
-            return template.render(**context)
-        except TemplateError as e:
-            raise ValueError(f"Error rendering step {step_id}: {str(e)}")
+        # Add step_number for Jinja conditionals (convert step_id to number)
+        # Assume step_id format is either numeric or find step index
+        steps = PromptManager.get_template_info(template_path).get("steps", [])
+        step_number = None
+        for i, step in enumerate(steps):
+            if step.get("id") == step_id:
+                step_number = i + 1  # 1-based indexing
+                break
+        
+        if step_number is None:
+            raise ValueError(f"Step {step_id} not found in template {template_path}")
+        
+        context["step_number"] = step_number
+        context["step_id"] = step_id  # Keep for backward compatibility
+        
+        # Render the entire template with step context
+        return PromptManager.get_prompt(template_path, **context)
 
     @staticmethod
     def get_prompt(template_path, prompt_type=None, **kwargs):
@@ -152,8 +161,10 @@ class PromptManager:
         ast = env.parse(post.content)
         variables = meta.find_undeclared_variables(ast)
         
-        # Remove 'prompt_type' from variables as it's a special internal variable
+        # Remove special internal variables
         variables.discard('prompt_type')
+        variables.discard('step_number')
+        variables.discard('step_id')
 
         # Extract category from the template path
         category = (
