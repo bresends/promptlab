@@ -1,5 +1,7 @@
 from pathlib import Path
 import frontmatter
+import importlib
+import json
 from jinja2 import Environment, FileSystemLoader, StrictUndefined, TemplateError, meta
 
 
@@ -187,4 +189,34 @@ class PromptManager:
             "frontmatter": post.metadata,
             "is_multi_step": is_multi_step,
             "steps": post.metadata.get("steps", []) if is_multi_step else [],
+            "schema": PromptManager.get_schema_json(template_path, post.metadata),
         }
+
+    @staticmethod
+    def get_schema_json(template_path, metadata):
+        """Get JSON schema string for a template if it has a schema_class"""
+        schema_class_path = metadata.get('schema_class')
+        if not schema_class_path:
+            return None
+            
+        try:
+            # Convert template path format to module path
+            # e.g., "youtube/compare_videos" -> "schemas.youtube.compare_videos"
+            if not schema_class_path.startswith('schemas.'):
+                # If relative path given, construct full path
+                module_path = f"schemas.{template_path.replace('/', '.')}"
+                class_name = schema_class_path
+            else:
+                # If full path given, split module and class
+                module_path, class_name = schema_class_path.rsplit('.', 1)
+            
+            # Import the module and get the class
+            module = importlib.import_module(module_path)
+            schema_class = getattr(module, class_name)
+            
+            # Return formatted JSON schema
+            return json.dumps(schema_class.model_json_schema(), indent=2)
+            
+        except (ImportError, AttributeError, ValueError) as e:
+            print(f"Warning: Could not load schema for {template_path}: {e}")
+            return None
