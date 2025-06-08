@@ -109,12 +109,21 @@ function copyGoogleSchema() {
         // Parse the existing JSON schema
         const schema = JSON.parse(schemaText);
         
-        // Transform to Google Gemini format - just extract the key parts
+        // Transform to Google Gemini format - extract key parts and remove title
         const googleSchema = {
             type: "object",
             required: schema.required || [],
             properties: schema.properties || {}
         };
+        
+        // Remove title from properties if present
+        if (googleSchema.properties) {
+            Object.values(googleSchema.properties).forEach(property => {
+                if (property.title) {
+                    delete property.title;
+                }
+            });
+        }
         
         // Copy the transformed schema
         copyToClipboard(JSON.stringify(googleSchema, null, 2), 'copyGoogleSchemaButton');
