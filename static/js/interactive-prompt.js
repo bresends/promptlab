@@ -16,17 +16,30 @@ function updatePrompt() {
         })
         .then(response => response.text())
         .then(html => {
-            // Parse the response to extract just the prompt preview
+            // Parse the response to extract the prompt previews
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            const newPreview = doc.getElementById('promptPreview');
-            if (newPreview) {
-                const currentPreview = document.getElementById('promptPreview');
-                if (currentPreview) {
-                    currentPreview.innerHTML = newPreview.innerHTML;
-                    // Re-highlight the syntax after updating content
+            
+            // Update system prompt preview
+            const newSystemPreview = doc.getElementById('systemPromptPreview');
+            if (newSystemPreview) {
+                const currentSystemPreview = document.getElementById('systemPromptPreview');
+                if (currentSystemPreview) {
+                    currentSystemPreview.innerHTML = newSystemPreview.innerHTML;
                     if (typeof Prism !== 'undefined') {
-                        Prism.highlightAllUnder(currentPreview);
+                        Prism.highlightAllUnder(currentSystemPreview);
+                    }
+                }
+            }
+            
+            // Update user prompt preview
+            const newUserPreview = doc.getElementById('userPromptPreview');
+            if (newUserPreview) {
+                const currentUserPreview = document.getElementById('userPromptPreview');
+                if (currentUserPreview) {
+                    currentUserPreview.innerHTML = newUserPreview.innerHTML;
+                    if (typeof Prism !== 'undefined') {
+                        Prism.highlightAllUnder(currentUserPreview);
                     }
                 }
             }
@@ -48,32 +61,70 @@ function clearForm() {
     updatePrompt();
 }
 
-function copyPrompt() {
-    const promptPreview = document.getElementById('promptPreview');
-    if (!promptPreview) return;
+function copySystemPrompt() {
+    const systemPreview = document.getElementById('systemPromptPreview');
+    if (!systemPreview) return;
 
-    // Get text content from the code element inside the pre tag
-    const codeElement = promptPreview.querySelector('code');
-    const promptText = codeElement ? codeElement.textContent : promptPreview.textContent;
-    navigator.clipboard.writeText(promptText).then(() => {
-        const button = document.getElementById('copyButton');
+    const codeElement = systemPreview.querySelector('code');
+    const promptText = codeElement ? codeElement.textContent : systemPreview.textContent;
+    copyToClipboard(promptText, 'copySystemButton');
+}
+
+function copyUserPrompt() {
+    const userPreview = document.getElementById('userPromptPreview');
+    if (!userPreview) return;
+
+    const codeElement = userPreview.querySelector('code');
+    const promptText = codeElement ? codeElement.textContent : userPreview.textContent;
+    copyToClipboard(promptText, 'copyUserButton');
+}
+
+function copyBothPrompts() {
+    const systemPreview = document.getElementById('systemPromptPreview');
+    const userPreview = document.getElementById('userPromptPreview');
+    if (!systemPreview || !userPreview) return;
+
+    const systemCode = systemPreview.querySelector('code');
+    const userCode = userPreview.querySelector('code');
+    const systemText = systemCode ? systemCode.textContent : systemPreview.textContent;
+    const userText = userCode ? userCode.textContent : userPreview.textContent;
+    
+    // Format for Claude web UI
+    const combinedText = `${systemText.trim()}\n\n${userText.trim()}`;
+    copyToClipboard(combinedText, 'copyBothButton');
+}
+
+function copyToClipboard(text, buttonId) {
+    navigator.clipboard.writeText(text).then(() => {
+        const button = document.getElementById(buttonId);
         if (!button) return;
 
-        const originalText = button.innerHTML;
-        button.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-            </svg>
-            Copied!
-        `;
-        button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-        button.classList.add('bg-green-600');
+        const originalHTML = button.innerHTML;
+        
+        // Show checkmark for clipboard icons or "Copied!" for the main button
+        if (buttonId === 'copyBothButton') {
+            button.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                Copied!
+            `;
+        } else {
+            // For clipboard icons, show a thin checkmark
+            button.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+            `;
+            button.classList.add('text-green-600');
+        }
 
         setTimeout(() => {
-            button.innerHTML = originalText;
-            button.classList.remove('bg-green-600');
-            button.classList.add('bg-blue-600', 'hover:bg-blue-700');
-        }, 2000);
+            button.innerHTML = originalHTML;
+            if (buttonId !== 'copyBothButton') {
+                button.classList.remove('text-green-600');
+            }
+        }, 1500);
     }).catch(err => {
         console.error('Failed to copy text: ', err);
         alert('Failed to copy to clipboard');
@@ -82,9 +133,20 @@ function copyPrompt() {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    const copyButton = document.getElementById('copyButton');
-    if (copyButton) {
-        copyButton.addEventListener('click', copyPrompt);
+    // Add event listeners for copy buttons
+    const copySystemButton = document.getElementById('copySystemButton');
+    if (copySystemButton) {
+        copySystemButton.addEventListener('click', copySystemPrompt);
+    }
+
+    const copyUserButton = document.getElementById('copyUserButton');
+    if (copyUserButton) {
+        copyUserButton.addEventListener('click', copyUserPrompt);
+    }
+
+    const copyBothButton = document.getElementById('copyBothButton');
+    if (copyBothButton) {
+        copyBothButton.addEventListener('click', copyBothPrompts);
     }
 
     // Initialize Prism highlighting

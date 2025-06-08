@@ -99,7 +99,7 @@ class PromptManager:
             raise ValueError(f"Error rendering step {step_id}: {str(e)}")
 
     @staticmethod
-    def get_prompt(template_path, **kwargs):
+    def get_prompt(template_path, prompt_type=None, **kwargs):
         env = PromptManager._get_env()
         template_file = f"{template_path}.jinja2"
 
@@ -109,11 +109,31 @@ class PromptManager:
         with open(full_path) as file:
             post = frontmatter.load(file)
 
+        # Add prompt_type to template context if provided
+        if prompt_type:
+            kwargs["prompt_type"] = prompt_type
+
         template = env.from_string(post.content)
         try:
             return template.render(**kwargs)
         except TemplateError as e:
             raise ValueError(f"Error rendering template: {str(e)}")
+
+    @staticmethod
+    def get_prompt_parts(template_path, **kwargs):
+        """Get both system and user parts of a prompt separately"""
+        try:
+            system_prompt = PromptManager.get_prompt(template_path, prompt_type="system", **kwargs)
+            user_prompt = PromptManager.get_prompt(template_path, prompt_type="user", **kwargs)
+            return {
+                "system": system_prompt.strip(),
+                "user": user_prompt.strip()
+            }
+        except Exception as e:
+            return {
+                "system": f"Error rendering system prompt: {str(e)}",
+                "user": f"Error rendering user prompt: {str(e)}"
+            }
 
     @staticmethod
     def get_template_info(template_path):
@@ -131,6 +151,9 @@ class PromptManager:
         env = PromptManager._get_env()
         ast = env.parse(post.content)
         variables = meta.find_undeclared_variables(ast)
+        
+        # Remove 'prompt_type' from variables as it's a special internal variable
+        variables.discard('prompt_type')
 
         # Extract category from the template path
         category = (

@@ -32,7 +32,7 @@ def render_prompt(template_path):
 
         # Initialize template data
         template_data = {}
-        rendered_prompt = ""
+        prompt_parts = {"system": "", "user": ""}
 
         # If this is a POST request, process the form data
         if request.method == "POST":
@@ -41,14 +41,17 @@ def render_prompt(template_path):
                 if key in template_info["variables"] and value.strip():
                     template_data[key] = value
 
-            # Try to render the prompt with current data
+            # Try to render the prompt parts with current data
             try:
-                rendered_prompt = PromptManager.get_prompt(
+                prompt_parts = PromptManager.get_prompt_parts(
                     template_path, **template_data
                 )
             except Exception as e:
                 # If rendering fails (missing variables), show partial render
-                rendered_prompt = f"Error rendering prompt: {str(e)}"
+                prompt_parts = {
+                    "system": f"Error rendering system prompt: {str(e)}",
+                    "user": f"Error rendering user prompt: {str(e)}"
+                }
         else:
             # For GET requests, try to render with empty values to show template structure
             try:
@@ -56,9 +59,12 @@ def render_prompt(template_path):
                 empty_data = {
                     var: f"[{var.upper()}]" for var in template_info["variables"]
                 }
-                rendered_prompt = PromptManager.get_prompt(template_path, **empty_data)
+                prompt_parts = PromptManager.get_prompt_parts(template_path, **empty_data)
             except Exception:
-                rendered_prompt = "Fill in the variables to see the rendered prompt."
+                prompt_parts = {
+                    "system": "Fill in the variables to see the rendered system prompt.",
+                    "user": "Fill in the variables to see the rendered user prompt."
+                }
 
         return render_template(
             "prompts/interactive.j2",
@@ -66,7 +72,7 @@ def render_prompt(template_path):
             template_path=template_path,
             template_info=template_info,
             template_data=template_data,
-            rendered_prompt=rendered_prompt,
+            prompt_parts=prompt_parts,
         )
 
     except Exception as e:
